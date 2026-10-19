@@ -6,6 +6,10 @@ import javax.swing.JOptionPane;
 
 public class MealPlanner {
 
+   static final int FEMALE_GOAL = 2000;
+   static final int MALE_GOAL = 2500;
+   static final int CALORIES_PER_MILE = 100;
+      
 
    // Menu stored as parallel arrays: index i in each array describes the same meal
    static String[] breakfastNames = {"Oatmeal with fruit", "Eggs and toast", "Breakfast burrito"};
@@ -21,12 +25,6 @@ public class MealPlanner {
    static String[] dinnerNames = {"Beef and rice bowl", "Pizza (2 slices)", "Salmon with vegetables"};
    static double[] dinnerCosts = {11.0, 10.0, 12.0};
    static int[] dinnerCalories = {850, 700, 650};
-
-
-   // Calorie goals and calories burned per mile jogged
-   static final int FEMALE_GOAL = 2000;
-   static final int MALE_GOAL = 2500;
-   static final int CALORIES_PER_MILE = 100;
 
 
    // The cheapest meal on the menu (Oatmeal with fruit)
@@ -50,8 +48,7 @@ public class MealPlanner {
 
 
        if (budget < CHEAPEST_MEAL) {
-           showMessage(String.format("Your budget of $%.2f isn't enough for any meal (cheapest is $%.2f).",
-                   budget, CHEAPEST_MEAL));
+           JOptionPane.showMessageDialog(null, "Your budget of $" + budget + " isn't enough for a meal. The cheapest meal costs $" + CHEAPEST_MEAL);
        }
 
 
@@ -83,26 +80,24 @@ public class MealPlanner {
            // Build the menu text and get the choice (1-3 becomes array index 0-2)
            String menu = "Here are today's " + mealType + " options:\n";
            for (int i = 0; i < names.length; i++) {
-               menu += String.format("%d. %s  -  $%.2f  (%d cal)%n", i + 1, names[i], costs[i], calories[i]);
+               menu += (i + 1) + ". " + names[i] + " - $" + costs[i] + " (" + calories[i] + " calories)\n";
            }
            int index = askForChoice(menu) - 1;
 
 
            // Too expensive: tell the user and let them choose again
            if (costs[index] > budget) {
-               showMessage(String.format("Sorry, the %s costs $%.2f and you don't have enough left in your budget.%n"
-                       + "Let's pick something else.", names[index], costs[index]));
-               continue;
-           }
+               JOptionPane.showMessageDialog(null, "Sorry, the " + names[index] + " costs $" + costs[index] + " and you don't have enough money. \nLet's pick something else.");
+
+           }else {
 
 
            // Update the budget and calorie total
            budget = budget - costs[index];
            totalCalories = totalCalories + calories[index];
-           showMessage(String.format("Enjoy your %s! That cost $%.2f and has %d calories.%n"
-                   + "Remaining budget: $%.2f%n"
-                   + "Total calories so far: %d",
-                   names[index], costs[index], calories[index], budget, totalCalories));
+           JOptionPane.showMessageDialog(null, "Enjoy your " + names[index] + "!\n" + "That cost $" + costs[index] + " and has " + calories[index] + " calories.\n"
+                   + "Remaining budget: $" + budget + "\n" 
+                   + "Total calories so far: " + totalCalories);
 
 
            // Decide whether to keep going
@@ -110,18 +105,19 @@ public class MealPlanner {
                showMessage("You don't have enough budget left for another meal today.");
                keepEating = false;
            } else if (totalCalories >= goal) {
-               showMessage("You've reached your calorie goal for the day.");
+               showMessage("You've reached or exceeded your calorie goal for the day.");
                keepEating = false;
            } else {
                keepEating = askForAnotherMeal();
            }
        }
-
+       }
 
        // End-of-day summary
        String summary = "===== Daily Summary =====\n"
                + "Total calories consumed: " + totalCalories + "\n"
-               + "Daily calorie goal: " + goal + "\n\n";
+               + "Daily calorie goal: " + goal + "\n"
+               + "Remaining budget: $" + budget + "\n\n";
 
 
        if (totalCalories < goal) {
@@ -134,8 +130,7 @@ public class MealPlanner {
            int extraCalories = totalCalories - goal;
            double miles = (double) extraCalories / CALORIES_PER_MILE;
            summary += "You are " + extraCalories + " calories over your goal.\n"
-                   + String.format("To burn off the extra calories, try jogging about %.1f miles around campus.",
-                   miles);
+                   + "To burn off the extra calories, try jogging about " + miles + " miles around campus.";
        }
        showMessage(summary);
    }
